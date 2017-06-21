@@ -28,7 +28,7 @@ class RainbowTable:
 
         for i in range(self.keylength):
             start_index = i * temp_num_chunks
-            one_chunk = a_hash[start_index : start_index + self.keylength]
+            one_chunk = a_hash[start_index : start_index + temp_num_chunks]
 
             if temp_extra > 0:
                 one_chunk = one_chunk + a_hash[-temp_extra]
