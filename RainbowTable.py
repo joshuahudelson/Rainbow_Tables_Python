@@ -17,11 +17,20 @@ class RainbowTable:
         self.rainbow_table = None
 
     def hash_a_key(self, key):
+        """ Generate a 40-digit hash from a key of
+            some length. (restrictions?)
+        """
         temp = key.encode('utf-8')
         self.hasher.update(temp)
         return self.hasher.hexdigest()
 
     def reduce_a_hash(self, a_hash, salt):
+        """ Take a hash and a salt (integer), generate a key.
+            The hash must be divided into self.keylength equal chunks:
+            each chunk is reduced to one letter of the resulting key.
+
+        """
+
         temp_reduced_string = ""
         temp_num_chunks = int(len(a_hash) / self.keylength)
         temp_extra = len(a_hash) % self.keylength
@@ -39,6 +48,7 @@ class RainbowTable:
             temp_reduced_string += LEGAL_KEYS[one_chunk % len(LEGAL_KEYS)]
 
         return temp_reduced_string
+
 
     def generate_unique_key(self):
         temp_string = ""
@@ -102,7 +112,7 @@ class RainbowTable:
     def regenerate_key(self, key):
         temp_key = key
         for i in range(self.num_links):
-            print("Did it " + str(i) + "time.")
+            print("Did it " + str(i) + " times.")
             temp_hash = self.hash_a_key(temp_key)
             if temp_hash == self.hash_to_crack:
                 print("Your key was: " + str(temp_key))
@@ -113,15 +123,16 @@ class RainbowTable:
 
 #-------------------------------------
 
-x = RainbowTable(15000, 7, 3)
+x = RainbowTable(15000, 10, 3)
+x.make_rainbow_table()
 x.hash_to_crack = "975f041c151aeba305ba96194d39fddc535e76b5"
 x.regenerate_key("tru")
-x.make_rainbow_table()
+"""
 for i in range(10):
     temp = x.hash_a_key(x.generate_unique_key())
     print(temp)
 x.run_searches()
-
+"""
 # 70000 rows takes 57 seconds (10 chainlength)
 # 10000 takes 1.7 seconds (10 chainlength)
 # but from chainlength 10 to 100, only 7.02 seconds (10000 rows)
