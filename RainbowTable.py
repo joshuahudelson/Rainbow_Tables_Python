@@ -29,15 +29,34 @@ class RainbowTable:
             The hash must be divided into self.keylength equal chunks:
             each chunk is reduced to one letter of the resulting key.
 
+            Example:
+
+            ahash = 2c6088d51a7e17115869fd3c1e360a835be46ddc
+            keylength = 9
+            temp_chunk_length = 4
+            extra = 4
+
+            chunk1: 2c60
+            chunk2: 88d5
+            chunk3: 1a7e
+            chunk4: 1711
+            chunk5: 5869
+            chunk6: fd3c
+            chunk7: 1e36
+            chunk8: 0a83
+            chunk9: 5be4
+            extra: 6ddc       => add 6 to chunk1, d to chunk 2, etc.
+
+            Then convert to int.  Then add salt.  Then convert to letter.
         """
 
         temp_reduced_string = ""
-        temp_num_chunks = int(len(a_hash) / self.keylength)
+        temp_chunk_length = int(float(len(a_hash)) / self.keylength)
         temp_extra = len(a_hash) % self.keylength
 
-        for i in range(self.keylength):
-            start_index = i * temp_num_chunks
-            one_chunk = a_hash[start_index : start_index + temp_num_chunks]
+        for letter_index in range(self.keylength):
+            start_index = letter_index * temp_chunk_length
+            one_chunk = a_hash[start_index : start_index + temp_chunk_length - 1]
 
             if temp_extra > 0:
                 one_chunk = one_chunk + a_hash[-temp_extra]
@@ -47,10 +66,14 @@ class RainbowTable:
             one_chunk += salt # add salt
             temp_reduced_string += LEGAL_KEYS[one_chunk % len(LEGAL_KEYS)]
 
+        print(temp_reduced_string)
         return temp_reduced_string
 
 
-    def generate_unique_key(self):
+    def generate_a_key(self):
+        """ Generates a key... but why do I think it's unique?
+            Fix this to make sure it's unique?
+        """
         temp_string = ""
         for _ in range(self.keylength):
             temp_string += choice(LEGAL_KEYS)
@@ -59,9 +82,9 @@ class RainbowTable:
     def generate_all_keys(self, num_rows, keylength):
         temp_list = []
         for _ in range(num_rows):
-            temp_string = self.generate_unique_key()
+            temp_string = self.generate_a_key()
             while temp_string in temp_list:
-                temp_string = self.generate_unique_key()
+                temp_string = self.generate_a_key()
             temp_list.append(temp_string)
         self.key_list = copy.deepcopy(temp_list)
 
@@ -127,9 +150,9 @@ x = RainbowTable(15000, 10, 3)
 x.make_rainbow_table()
 x.hash_to_crack = "975f041c151aeba305ba96194d39fddc535e76b5"
 x.regenerate_key("tru")
-"""
+
 for i in range(10):
-    temp = x.hash_a_key(x.generate_unique_key())
+    temp = x.hash_a_key(x.generate_a_key())
     print(temp)
 x.run_searches()
 """
@@ -137,3 +160,4 @@ x.run_searches()
 # 10000 takes 1.7 seconds (10 chainlength)
 # but from chainlength 10 to 100, only 7.02 seconds (10000 rows)
 # chainlength 1000 = 66 seconds (10000 rows)
+"""
